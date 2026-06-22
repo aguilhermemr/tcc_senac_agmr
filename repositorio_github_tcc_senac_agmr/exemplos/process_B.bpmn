@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_ProcessB"
+                  targetNamespace="http://senac.angelia/bpmn"
+                  exporter="manual" exporterVersion="1.0">
+  <bpmn:process id="Process_ComprasCorporativas" name="Compras Corporativas" isExecutable="true">
+
+    <bpmn:startEvent id="StartEvent_B1" name="Requisicao de compra">
+      <bpmn:outgoing>Flow_B1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="Task_AnaliseSolicitacao" name="Analise da solicitacao">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="240"/>
+          <zeebe:property name="cost" value="15"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_B1</bpmn:incoming>
+      <bpmn:outgoing>Flow_B2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:parallelGateway id="Gateway_ParalelaFork" name="Cotacoes paralelas">
+      <bpmn:incoming>Flow_B2</bpmn:incoming>
+      <bpmn:outgoing>Flow_B3a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_B3b</bpmn:outgoing>
+      <bpmn:outgoing>Flow_B3c</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <bpmn:userTask id="Task_CotacaoA" name="Cotacao fornecedor A">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="480"/>
+          <zeebe:property name="cost" value="25"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_B3a</bpmn:incoming>
+      <bpmn:outgoing>Flow_B4a</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_CotacaoB" name="Cotacao fornecedor B">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="480"/>
+          <zeebe:property name="cost" value="25"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_B3b</bpmn:incoming>
+      <bpmn:outgoing>Flow_B4b</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_CotacaoC" name="Cotacao fornecedor C">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="480"/>
+          <zeebe:property name="cost" value="25"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_B3c</bpmn:incoming>
+      <bpmn:outgoing>Flow_B4c</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:parallelGateway id="Gateway_ParalelaJoin" name="Sincronizacao">
+      <bpmn:incoming>Flow_B4a</bpmn:incoming>
+      <bpmn:incoming>Flow_B4b</bpmn:incoming>
+      <bpmn:incoming>Flow_B4c</bpmn:incoming>
+      <bpmn:outgoing>Flow_B5</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <bpmn:userTask id="Task_SelecaoFornecedor" name="Selecao do fornecedor">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="180"/>
+          <zeebe:property name="cost" value="20"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_B5</bpmn:incoming>
+      <bpmn:outgoing>Flow_B6</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_ValorAprovacao" name="Valor > R$ 50k?">
+      <bpmn:incoming>Flow_B6</bpmn:incoming>
+      <bpmn:outgoing>Flow_B7a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_B7b</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_AprovacaoDiretoria" name="Aprovacao da diretoria">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="1440"/>
+          <zeebe:property name="cost" value="60"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_B7a</bpmn:incoming>
+      <bpmn:outgoing>Flow_B8a</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_EmissaoPedido" name="Emissao do pedido">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="60"/>
+          <zeebe:property name="cost" value="5"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_B7b</bpmn:incoming>
+      <bpmn:incoming>Flow_B8a</bpmn:incoming>
+      <bpmn:outgoing>Flow_B9</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:endEvent id="EndEvent_B1" name="Pedido emitido">
+      <bpmn:incoming>Flow_B9</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_B1" sourceRef="StartEvent_B1" targetRef="Task_AnaliseSolicitacao"/>
+    <bpmn:sequenceFlow id="Flow_B2" sourceRef="Task_AnaliseSolicitacao" targetRef="Gateway_ParalelaFork"/>
+    <bpmn:sequenceFlow id="Flow_B3a" sourceRef="Gateway_ParalelaFork" targetRef="Task_CotacaoA"/>
+    <bpmn:sequenceFlow id="Flow_B3b" sourceRef="Gateway_ParalelaFork" targetRef="Task_CotacaoB"/>
+    <bpmn:sequenceFlow id="Flow_B3c" sourceRef="Gateway_ParalelaFork" targetRef="Task_CotacaoC"/>
+    <bpmn:sequenceFlow id="Flow_B4a" sourceRef="Task_CotacaoA" targetRef="Gateway_ParalelaJoin"/>
+    <bpmn:sequenceFlow id="Flow_B4b" sourceRef="Task_CotacaoB" targetRef="Gateway_ParalelaJoin"/>
+    <bpmn:sequenceFlow id="Flow_B4c" sourceRef="Task_CotacaoC" targetRef="Gateway_ParalelaJoin"/>
+    <bpmn:sequenceFlow id="Flow_B5" sourceRef="Gateway_ParalelaJoin" targetRef="Task_SelecaoFornecedor"/>
+    <bpmn:sequenceFlow id="Flow_B6" sourceRef="Task_SelecaoFornecedor" targetRef="Gateway_ValorAprovacao"/>
+    <bpmn:sequenceFlow id="Flow_B7a" sourceRef="Gateway_ValorAprovacao" targetRef="Task_AprovacaoDiretoria">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= valor &gt; 50000</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_B7b" sourceRef="Gateway_ValorAprovacao" targetRef="Task_EmissaoPedido">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= valor &lt;= 50000</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_B8a" sourceRef="Task_AprovacaoDiretoria" targetRef="Task_EmissaoPedido"/>
+    <bpmn:sequenceFlow id="Flow_B9" sourceRef="Task_EmissaoPedido" targetRef="EndEvent_B1"/>
+
+  </bpmn:process>
+</bpmn:definitions>
