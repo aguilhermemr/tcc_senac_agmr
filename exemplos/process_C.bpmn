@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_ProcessC"
+                  targetNamespace="http://senac.angelia/bpmn"
+                  exporter="manual" exporterVersion="1.0">
+  <bpmn:process id="Process_GestaoIncidentes" name="Gestao de Incidentes" isExecutable="true">
+
+    <bpmn:startEvent id="StartEvent_C1" name="Incidente reportado">
+      <bpmn:outgoing>Flow_C1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="Task_Classificacao" name="Classificacao do incidente">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="120"/>
+          <zeebe:property name="cost" value="8"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_C1</bpmn:incoming>
+      <bpmn:outgoing>Flow_C2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_Severidade" name="Severidade?">
+      <bpmn:incoming>Flow_C2</bpmn:incoming>
+      <bpmn:outgoing>Flow_C3a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_C3b</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_AtendimentoN1" name="Atendimento nivel 1">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="600"/>
+          <zeebe:property name="cost" value="20"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_C3a</bpmn:incoming>
+      <bpmn:incoming>Flow_C7_loop</bpmn:incoming>
+      <bpmn:outgoing>Flow_C4</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_Resolvido" name="Resolvido?">
+      <bpmn:incoming>Flow_C4</bpmn:incoming>
+      <bpmn:outgoing>Flow_C5a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_C5b</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_Escalonamento" name="Escalonamento">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="180"/>
+          <zeebe:property name="cost" value="15"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_C5b</bpmn:incoming>
+      <bpmn:outgoing>Flow_C6</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_RetornoOuN2" name="Reabrir N1 ou ir N2?">
+      <bpmn:incoming>Flow_C6</bpmn:incoming>
+      <bpmn:outgoing>Flow_C7_loop</bpmn:outgoing>
+      <bpmn:outgoing>Flow_C7_n2</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_AtendimentoN2" name="Atendimento nivel 2 (especialista)">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="1200"/>
+          <zeebe:property name="cost" value="60"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_C3b</bpmn:incoming>
+      <bpmn:incoming>Flow_C7_n2</bpmn:incoming>
+      <bpmn:outgoing>Flow_C8</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_FechamentoTicket" name="Fechamento e documentacao">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="duration" value="120"/>
+          <zeebe:property name="cost" value="6"/>
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_C5a</bpmn:incoming>
+      <bpmn:incoming>Flow_C8</bpmn:incoming>
+      <bpmn:outgoing>Flow_C9</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:endEvent id="EndEvent_C1" name="Incidente fechado">
+      <bpmn:incoming>Flow_C9</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_C1" sourceRef="StartEvent_C1" targetRef="Task_Classificacao"/>
+    <bpmn:sequenceFlow id="Flow_C2" sourceRef="Task_Classificacao" targetRef="Gateway_Severidade"/>
+    <bpmn:sequenceFlow id="Flow_C3a" sourceRef="Gateway_Severidade" targetRef="Task_AtendimentoN1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= severidade &lt; 4</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_C3b" sourceRef="Gateway_Severidade" targetRef="Task_AtendimentoN2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= severidade &gt;= 4</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_C4" sourceRef="Task_AtendimentoN1" targetRef="Gateway_Resolvido"/>
+    <bpmn:sequenceFlow id="Flow_C5a" sourceRef="Gateway_Resolvido" targetRef="Task_FechamentoTicket">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= resolvido = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_C5b" sourceRef="Gateway_Resolvido" targetRef="Task_Escalonamento">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= resolvido = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_C6" sourceRef="Task_Escalonamento" targetRef="Gateway_RetornoOuN2"/>
+    <bpmn:sequenceFlow id="Flow_C7_loop" sourceRef="Gateway_RetornoOuN2" targetRef="Task_AtendimentoN1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= escalar_n2 = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_C7_n2" sourceRef="Gateway_RetornoOuN2" targetRef="Task_AtendimentoN2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= escalar_n2 = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_C8" sourceRef="Task_AtendimentoN2" targetRef="Task_FechamentoTicket"/>
+    <bpmn:sequenceFlow id="Flow_C9" sourceRef="Task_FechamentoTicket" targetRef="EndEvent_C1"/>
+
+  </bpmn:process>
+</bpmn:definitions>
