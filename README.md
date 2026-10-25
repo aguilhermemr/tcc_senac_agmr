@@ -2,7 +2,7 @@
 
 Código de apoio ao TCC *"Otimização de Workflows Empresariais com Machine Learning: Integração de Reinforcement Learning e Graph Neural Networks em Tecnologias BPM"*, de **Angel Guillermo Morales Romero**, apresentado na **Especialização em Inteligência Artificial do Centro Universitário Senac** (São Paulo, 2026), sob orientação do Prof. João Carlos Néto. Implementa o estudo de caso descrito no Capítulo 5.
 
-📄 **[Ler o TCC completo (PDF)](docs/TCC_Senac_AGMR_2026.pdf)**
+**[Ler o TCC completo (PDF)](docs/TCC_Senac_AGMR_2026.pdf)**
 
 *In English:* code for my postgraduate thesis (Senac, Brazil, 2026). A reinforcement-learning agent (Maskable PPO) with a Graph Attention Network policy learns to route cases through BPMN 2.0 workflows exported from Camunda 8, compared against FIFO and fixed-priority baselines. Structural fidelity of the simulated processes was validated with PM4Py.
 
