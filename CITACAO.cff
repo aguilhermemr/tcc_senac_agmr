@@ -23,8 +23,8 @@ preferred-citation:
   authors:
     - family-names: "Morales Romero"
       given-names: "Angel Guillermo"
-  title: "Otimização de Workflows Empresariais com Machine Learning: uma arquitetura PPO+GAT integrada ao Camunda Platform 8"
-  thesis-type: "Trabalho de Conclusão de Curso (TCC)"
+  title: "Otimização de Workflows Empresariais com Machine Learning: Integração de Reinforcement Learning e Graph Neural Networks em Tecnologias BPM"
+  thesis-type: "Trabalho de Conclusão de Curso (Especialização em Inteligência Artificial)"
   institution:
     name: "Centro Universitário Senac"
     city: "São Paulo"
