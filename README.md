@@ -1,6 +1,8 @@
 # tcc_senac_agmr — pipeline PPO+GAT para otimização de workflows BPMN
 
-Código de apoio ao TCC *"Otimização de Workflows Empresariais com Machine Learning: uma arquitetura PPO+GAT integrada ao Camunda Platform 8"*, de **Angel Guillermo Morales Romero**, apresentado na **pós-graduação lato sensu em Inteligência Artificial do Centro Universitário Senac** (São Paulo, 2026). Implementa o estudo de caso descrito no Capítulo 5.
+Código de apoio ao TCC *"Otimização de Workflows Empresariais com Machine Learning: Integração de Reinforcement Learning e Graph Neural Networks em Tecnologias BPM"*, de **Angel Guillermo Morales Romero**, apresentado na **Especialização em Inteligência Artificial do Centro Universitário Senac** (São Paulo, 2026), sob orientação do Prof. João Carlos Néto. Implementa o estudo de caso descrito no Capítulo 5.
+
+📄 **[Ler o TCC completo (PDF)](docs/TCC_Senac_AGMR_2026.pdf)**
 
 *In English:* code for my postgraduate thesis (Senac, Brazil, 2026). A reinforcement-learning agent (Maskable PPO) with a Graph Attention Network policy learns to route cases through BPMN 2.0 workflows exported from Camunda 8, compared against FIFO and fixed-priority baselines. Structural fidelity of the simulated processes was validated with PM4Py.
 
@@ -165,6 +167,10 @@ local na porta 5000. Para cada run você verá:
 ## Validação estrutural (PM4Py)
 
 A pasta `resultados/` traz as métricas medidas com PM4Py sobre os event logs simulados dos três processos (fitness, precision, generalization e simplicity) e o script para reproduzi-las. Ver `resultados/LEIAME.md`.
+
+## Documento do TCC
+
+A versão final do trabalho está em [`docs/TCC_Senac_AGMR_2026.pdf`](docs/TCC_Senac_AGMR_2026.pdf) (96 páginas, em português). Também disponível na [biblioteca do meu portfólio](https://aguilhermemr.github.io/#biblioteca).
 
 ## Autoria e citação
 
